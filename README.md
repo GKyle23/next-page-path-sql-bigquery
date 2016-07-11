@@ -93,7 +93,10 @@ EXACT_COUNT_DISTINCT(sessionHitId) as pageviews,
 SUM(uniquePageviews) OVER (PARTITION BY step) stepOneUniquePageviews,
 SUM(pageviews) OVER (PARTITION BY step) stepOnePageviews,
 FROM (
-SELECT sessionId, hitNumber, CONCAT(STRING(sessionId),STRING(hitNumber)) as sessionHitId, step, nextStep
+SELECT
+sessionId, hitNumber,
+CONCAT(STRING(sessionId),STRING(hitNumber)) as sessionHitId,
+step, nextStep
 FROM (
 SELECT 
 CONCAT(STRING(fullVisitorId),
