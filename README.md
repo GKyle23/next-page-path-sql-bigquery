@@ -7,7 +7,7 @@ Here are some example scripts using both [BigQuery SQL](#BigQuery) and [PostgreS
 
 (Example includes the inclusion of Google Analytics custom dimensions and an expression to evaluate a landing page)
 
-```sql
+```bigquery
 SELECT 
 a.date as date,
 a.user AS userId,
