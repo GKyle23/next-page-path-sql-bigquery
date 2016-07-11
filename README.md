@@ -5,7 +5,7 @@ Here are some example scripts using both [BigQuery SQL](#BigQuery) and [PostgreS
 
 1) What are our conversion rates for users starting registration through to purchase at a session level?
 
-(Example includes the inclusion of Google Analytics custom dimensions and an expression to evaluate a landing page)
+*(Example includes the inclusion of Google Analytics custom dimensions and an expression to evaluate a landing page)*
 
 ```sql
 SELECT 
@@ -37,7 +37,7 @@ COUNT (CASE WHEN REGEXP_MATCH(GROUP_CONCAT_UNQUOTED (LOWER(a.event_action)),
 r"(started registration,completed registration)") THEN a.sessionId END ) as StartReg_EndReg,
 COUNT (CASE WHEN REGEXP_MATCH(GROUP_CONCAT_UNQUOTED (LOWER(a.event_action)),
 r"(started registration,completed registration,purchased)") THEN a.sessionId END ) as StartReg_EndReg_Purchase,
-GROUP_CONCAT (a.event_action) as event_action_hit_path
+GROUP_CONCAT (a.event_action) as event_action_hit_path -- provides a check
 FROM (
   SELECT
   date,
@@ -51,27 +51,29 @@ FROM (
   device.browser as browser,
   LOWER(hits.eventInfo.eventAction) as event_action,
   LOWER(hits.eventInfo.eventLabel) as event_label 
-  FROM (TABLE_DATE_RANGE([82514188.ga_sessions_], 
-  TIMESTAMP("2016-07-10"),TIMESTAMP("2016-07-10")))  
+  FROM (TABLE_DATE_RANGE([XXXXXXXX.ga_sessions_], 
+  TIMESTAMP("2016-07-10"),TIMESTAMP("2016-07-08")))  
   WHERE LOWER(hits.eventInfo.eventAction) 
   IN ("started registration","completed registration","registration blocked",
   "registration error")
-  GROUP EACH BY date, user,a.sessionId, geo_country, source, medium, device_category, 
+  GROUP EACH BY date, user, a.sessionId, geo_country, source, medium, device_category, 
   operating_system, browser, event_action, event_label
   ORDER BY a.sessionId ASC
 ) a
 JOIN EACH(
   SELECT
   CONCAT([fullVisitorId], STRING([visitId])) as b.sessionId,
-  MAX(IF(hits.customDimensions.index=1,hits.customDimensions.value,NULL)) AS clientId,
+  --MAX(IF(... provides a workaround for custom dimensions which are nested within the hits field
+  MAX(IF(hits.customDimensions.index=1,hits.customDimensions.value,NULL)) AS clientId, 
   MAX(IF(customDimensions.index=65,customDimensions.value,NULL)) AS promo_code,
+  --evaluate landing page with the 'FIRST' function
   FIRST(CASE WHEN hits.type = "PAGE" THEN hits.page.pagePath ELSE "UNKNOWN" END) as landing_page 
-  FROM (TABLE_DATE_RANGE([82514188.ga_sessions_], TIMESTAMP("2016-07-10"),
-  TIMESTAMP("2016-07-10")))   
+  FROM (TABLE_DATE_RANGE([XXXXXXXX.ga_sessions_], TIMESTAMP("2016-07-10"),
+  TIMESTAMP("2016-07-08")))   
   GROUP EACH BY b.sessionId
 ) b
 ON a.sessionId = b.sessionId
-GROUP EACH BY date,geo_country,userId,sessionId,a.sessionId,clientId,promo_code,channel_grouping,
-landing_page,device_category,operating_system,browser
+GROUP EACH BY date, geo_country, userId, sessionId, a.sessionId, clientId, promo_code, channel_grouping,
+landing_page, device_category, operating_system, browser
 HAVING StartReg > 0;
 ```
