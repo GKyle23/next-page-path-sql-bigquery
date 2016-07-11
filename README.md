@@ -54,7 +54,7 @@ FROM (
   FROM (TABLE_DATE_RANGE([XXXXXXXX.ga_sessions_], 
   TIMESTAMP("2016-07-10"),TIMESTAMP("2016-07-08")))  
   WHERE LOWER(hits.eventInfo.eventAction) 
-  IN ("started registration","completed registration","registration blocked",
+  IN ("started registration","completed registration","email already registered",
   "registration error")
   GROUP EACH BY date, user, a.sessionId, geo_country, source, medium, device_category, 
   operating_system, browser, event_action, event_label
