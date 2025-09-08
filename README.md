@@ -34,3 +34,11 @@ Options (see [`docs/run-legacy-sql.md`](docs/run-legacy-sql.md) for full details
    ```sql
    #legacySQL
    -- rest of the query
+
+2. **BigQuery web UI** → toggle “Use Legacy SQL” in query settings
+
+3. **bq CLI**
+
+```bash
+bq query --use_legacy_sql=true < sql/legacy/bigquery/next-page-path.sql
+
