@@ -26,19 +26,21 @@ More detail in [`docs/ga-ua-schema-context.md`](docs/ga-ua-schema-context.md).
 
 ## Running the Query (Legacy SQL)
 
-By default, BigQuery uses **Standard SQL**. To run this script, you need to enable **Legacy SQL** mode.
+see [`docs/run-legacy-sql.md`](docs/run-legacy-sql.md) for full details
 
-Options (see [`docs/run-legacy-sql.md`](docs/run-legacy-sql.md) for full details):
 
-1. **Add pragma in the file**  
-   ```sql
-   #legacySQL
-   -- rest of the query
 
-2. **BigQuery web UI** → toggle “Use Legacy SQL” in query settings
+## What this repository is not
 
-3. **bq CLI**
+- It’s not a production-ready analytics package.
+- It’s not a modern BigQuery Standard SQL implementation.
+- It’s not accepting PRs that rewrite the SQL to Standard SQL.
 
-```bash
-bq query --use_legacy_sql=true < sql/legacy/bigquery/next-page-path.sql
+## Background
 
+This was originally put together to answer questions like:
+- “When a user views page X, what’s the next step?”
+- “What’s the step-to-step drop-off in a simple registration funnel?”
+- “How can I inspect event paths at a session level quickly?”
+
+It also demonstrates techniques users commonly tried in early GA→BigQuery workflows (e.g., `TABLE_DATE_RANGE` over GA export tables and simple pathing via `LEAD` + `ROW_NUMBER()`).
